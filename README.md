@@ -1,6 +1,6 @@
 ﻿# DelphiHookUtils
 
-Delphi API Hook 工具项目
+Delphi API Hook 工具项目(Delphi6~Delphi XE 10.2)
 
 ![LOGO](https://github.com/delphilite/DelphiHookUtils/raw/master/Doc/Logo.jpg)
 
@@ -29,4 +29,4 @@ Delphi API Hook 工具项目
 
 ## 其他
 
-初步 Delphi 2007-10.1, Lazarus/Typhon/FPC x86/x64 for Win 一切正常，大家有问题及时反馈 ！？
+初步 Delphi 6-10.2, Lazarus/Typhon/FPC x86/x64 for Win 一切正常，大家有问题及时反馈 ！？
