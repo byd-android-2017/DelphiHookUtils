@@ -33,15 +33,19 @@ uses
   ComObj, ShlObj, HookIntfs, HookUtils;
 
 var
-  MessageBoxNext: function (hWnd: HWND; lpText, lpCaption: PChar; uType: UINT): Integer; stdcall;
+  MessageBoxNext: function (hWnd: HWND; //
+     lpText, lpCaption: PChar; uType: UINT): Integer; stdcall;
 
-function MessageBoxCallBack(hWnd: HWND; lpText, lpCaption: PChar; uType: UINT): Integer; stdcall;
+function MessageBoxCallBack(hWnd: HWND; //
+   lpText, lpCaption: PChar; uType: UINT): Integer; stdcall;
 var
   S: string;
 begin
   if Copy(lpText, 1, 5) = 'hello' then
     S := '我把 hello 开头的文字改成现在的样子了'
-  else S := lpText;
+  else
+    S := lpText;
+
   Result := MessageBoxNext(hWnd, PChar(S), lpCaption, uType);
 end;
 
@@ -53,7 +57,7 @@ function ShellLinkSetPathCallBack(Self: IShellLink; pszFile: LPTSTR): HResult; s
 begin
   ShowMessage(Format('你调用到 ISHellLink($%x) 的 SetPath 方法了，参数 "%s"',
     [NativeInt(Pointer(Self)), string(pszFile)]));
-  Result := ShellLinkSetPathNext(Self, 'd:\Windows');
+  Result := ShellLinkSetPathNext(Self, 'D:\GitHub');
 end;
 
 var
@@ -69,6 +73,24 @@ end;
 
 { TMainForm }
 
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  ShellLink := CreateComObject(CLSID_ShellLink) as IShellLink;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(MessageBoxNext) then
+    UnhookProc(@MessageBoxNext); // 解除钩子
+
+  if Assigned(ObjectFreeInstanceNext) then
+    UnhookProc(@ObjectFreeInstanceNext);
+
+  if Assigned(ShellLinkSetPathNext) then
+    UnhookProc(@ShellLinkSetPathNext);
+end;
+
+
 procedure TMainForm.cbHookAPIClick(Sender: TObject);
 const
 {$IFDEF UNICODE}
@@ -76,6 +98,7 @@ const
 {$ELSE}
   MessageBoxProcName = 'MessageBoxA';
 {$ENDIF}
+
 begin
   if TCheckBox(Sender).Checked then
   begin
@@ -96,6 +119,7 @@ begin
       UnhookProc(@MessageBoxNext);
     @MessageBoxNext := nil;
   end;
+
   // 触发 MessageBox API 调用
   MessageBox(Handle, 'hello world!', '', 0);
 end;
@@ -144,19 +168,5 @@ begin
   end;
 end;
 
-procedure TMainForm.FormCreate(Sender: TObject);
-begin
-  ShellLink := CreateComObject(CLSID_ShellLink) as IShellLink;
-end;
-
-procedure TMainForm.FormDestroy(Sender: TObject);
-begin
-  if Assigned(MessageBoxNext) then
-    UnhookProc(@MessageBoxNext);
-  if Assigned(ObjectFreeInstanceNext) then
-    UnhookProc(@ObjectFreeInstanceNext);
-  if Assigned(ShellLinkSetPathNext) then
-    UnhookProc(@ShellLinkSetPathNext);
-end;
 
 end.

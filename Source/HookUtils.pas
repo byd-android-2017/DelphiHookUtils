@@ -63,6 +63,11 @@ unit HookUtils;
 
 interface
 
+{$ifndef UNICODE}
+type
+   NativeInt = Integer;
+{$ENDIF}
+
 function HookProc(ATargetProc, ANewProc: Pointer;
   out AOldProc: Pointer): Boolean; overload;
 function HookProc(const ATargetModule, ATargetProc: string; ANewProc: Pointer;
@@ -84,7 +89,10 @@ const
 type
 {$IFNDEF FPC} {$IF CompilerVersion < 23}
   NativeUInt = LongWord;
+  UINT_PTR = NativeUInt;
 {$IFEND} {$ENDIF}
+
+
 
   TJMPCode = packed record
 {$IFDEF USELONGJMP}
